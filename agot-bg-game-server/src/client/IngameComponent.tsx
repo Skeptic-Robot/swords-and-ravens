@@ -73,6 +73,8 @@ import houseInfluenceImages from "./houseInfluenceImages";
 import houseOrderImages from "./houseOrderImages";
 import housePowerTokensImages from "./housePowerTokensImages";
 import unitImages from "./unitImages";
+import CustomDraftHouseCardsGameState from "../common/ingame-game-state/custom-draft-house-cards-game-state/CustomDraftHouseCardsGameState";
+import CustomDraftHouseCardsGameComponent from "./game-state-panel/CustomDraftHouseCardsComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -138,7 +140,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         const forceResponsiveLayout = this.user ? this.user.settings.responsiveLayout : false;
         const mobileDevice = isMobile;
-        const draftHouseCards = this.props.gameState.childGameState instanceof DraftHouseCardsGameState;
+        const draftHouseCards = this.props.gameState.childGameState instanceof DraftHouseCardsGameState || this.props.gameState.childGameState instanceof CustomDraftHouseCardsGameState;
 
         const columnOrders = this.getColumnOrders(mobileDevice);
         const gameStateColumnSpan = this.getGameStateColumnSpan(mobileDevice, forceResponsiveLayout, draftHouseCards);
@@ -382,6 +384,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     phases.map(phase => [phase.gameState, phase.component] as [any, typeof Component]),
                                                     [[ThematicDraftHouseCardsGameState, ThematicDraftHouseCardsComponent]],
                                                     [[DraftHouseCardsGameState, DraftHouseCardsComponent]],
+                                                    [[CustomDraftHouseCardsGameState, CustomDraftHouseCardsGameComponent]],
                                                     [[GameEndedGameState, GameEndedComponent]],
                                                     [[CancelledGameState, IngameCancelledComponent]]
                                                 )

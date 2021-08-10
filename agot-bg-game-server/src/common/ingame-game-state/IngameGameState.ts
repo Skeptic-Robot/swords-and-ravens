@@ -32,12 +32,13 @@ import DraftHouseCardsGameState, { SerializedDraftHouseCardsGameState } from "./
 import CombatGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import DeclareSupportGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
 import ThematicDraftHouseCardsGameState, { SerializedThematicDraftHouseCardsGameState } from "./thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
+import CustomDraftHouseCardsGameState, { SerializedCustomDraftHouseCardsGameState } from "./custom-draft-house-cards-game-state/CustomDraftHouseCardsGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
 export default class IngameGameState extends GameState<
     EntireGame,
-    DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
+    DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | CustomDraftHouseCardsGameState | WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
 > {
     players: BetterMap<User, Player> = new BetterMap<User, Player>();
     game: Game;
@@ -78,7 +79,9 @@ export default class IngameGameState extends GameState<
     }
 
     beginDraftingHouseCards(): void {
-        if (this.entireGame.gameSettings.thematicDraft) {
+        if (this.entireGame.gameSettings.customDraft) {
+            this.setChildGameState(new CustomDraftHouseCardsGameState(this)).firstStart();
+        } else if (this.entireGame.gameSettings.thematicDraft) {
             this.setChildGameState(new ThematicDraftHouseCardsGameState(this)).firstStart();
         } else {
             this.setChildGameState(new DraftHouseCardsGameState(this)).firstStart();
@@ -783,6 +786,8 @@ export default class IngameGameState extends GameState<
                 return DraftHouseCardsGameState.deserializeFromServer(this, data);
             case "thematic-draft-house-cards":
                 return ThematicDraftHouseCardsGameState.deserializeFromServer(this, data);
+            case "custom-draft-house-cards":
+                return CustomDraftHouseCardsGameState.deserializeFromServer(this,data);
         }
     }
 }
@@ -795,5 +800,5 @@ export interface SerializedIngameGameState {
     gameLogManager: SerializedGameLogManager;
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
         | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedDraftHouseCardsGameState
-        | SerializedThematicDraftHouseCardsGameState;
+        | SerializedThematicDraftHouseCardsGameState | SerializedCustomDraftHouseCardsGameState;
 }
