@@ -102,7 +102,7 @@ export default class GlobalServer {
 
         // Validate the JSON
         if (!this.clientMessageValidator(message)) {
-            console.warn(`Unvalid schema of JSON message: ${data}, ${this.clientMessageValidator.errors}`);
+            console.warn(`Invalid schema of JSON message: ${data}, ${this.clientMessageValidator.errors}`);
             return;
         }
 

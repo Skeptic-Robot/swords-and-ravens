@@ -17,7 +17,7 @@ import House from "./game-data-structure/House";
 import Unit from "./game-data-structure/Unit";
 import PlanningRestriction from "./game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
 import GameLogManager, {SerializedGameLogManager} from "./game-data-structure/GameLogManager";
-import {GameLogData} from "./game-data-structure/GameLog";
+import GameLog, {GameLogData} from "./game-data-structure/GameLog";
 import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-game-state/GameEndedGameState";
 import UnitType from "./game-data-structure/UnitType";
 import WesterosCard from "./game-data-structure/westeros-card/WesterosCard";
@@ -178,6 +178,9 @@ export default class IngameGameState extends GameState<
             }
 
             this.createVote(user, new ReplacePlayer(user, player.user, player.house));
+        } else if (message.type == "update-last-seen-logs") {
+            console.log("update-last-seen")
+            this.gameLogManager.lastSeenLogs.replace(this.entireGame.users.get(message.user),{time: new Date(message.log.time * 1000), data: message.log.data})
         } else if (this.players.has(user)) {
             const player = this.players.get(user);
 
@@ -488,7 +491,7 @@ export default class IngameGameState extends GameState<
             this.game.deletedHouseCards = new BetterMap(message.houseCards.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]));
         } else if (message.type == "update-max-turns") {
             this.game.maxTurns = message.maxTurns;
-        } else {
+        }else {
             this.childGameState.onServerMessage(message);
         }
     }
@@ -732,6 +735,16 @@ export default class IngameGameState extends GameState<
         }
 
         return true;
+    }
+
+    onLogSeen(log: GameLog, user: User | null): void {
+        if(user){
+            this.entireGame.sendMessageToServer({
+                type: "update-last-seen-logs",
+                user: user.id,
+                log: {time: log.time.getTime() / 1000, data: log.data}
+            })
+        }
     }
 
     serializeToClient(admin: boolean, user: User | null): SerializedIngameGameState {

@@ -19,7 +19,7 @@ import _ from "lodash";
 import joinReactNodes from "./utils/joinReactNodes";
 import orders from "../common/ingame-game-state/game-data-structure/orders";
 import CombatInfoComponent from "./CombatInfoComponent";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Badge, OverlayTrigger, Tooltip } from "react-bootstrap";
 import User from "../server/User";
 import { baseHouseCardsData, adwdHouseCardsData, ffcHouseCardsData, modAHouseCardsData, modBHouseCardsData , HouseCardData } from "../common/ingame-game-state/game-data-structure/createGame";
 import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
@@ -28,9 +28,11 @@ import BetterMap from "../utils/BetterMap";
 import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
+import { width } from "@fortawesome/free-solid-svg-icons/faAngleLeft";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
+    user: User | null;
 }
 
 @observer
@@ -43,6 +45,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
     get world(): World {
         return this.game.world;
+    }
+
+    get lastSeenLog(): {time: Date, data: GameLogData} | null {
+        if(this.props.user){
+            return this.props.ingameGameState.gameLogManager.lastSeenLogs.get(this.props.user);
+        }else {
+            return null
+        }
     }
 
     createHouseCards(data: [string, HouseCardData][]): [string, HouseCard][] {
@@ -88,6 +98,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 <Col>
                     <div className="game-log-content">
                         {this.renderGameLogData(l.data)}
+                        {this.lastSeenLog != null && this.renderGameLogData(this.lastSeenLog.data)}
+                        {this.lastSeenLog != null && l.time.getTime() == this.lastSeenLog.time.getTime() && this.renderNewLogsLine()}
                     </div>
                 </Col>
             </Row>
@@ -1314,5 +1326,31 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </>;
             }
         }
+    }
+
+    renderNewLogsLine(): ReactNode {
+        return <Row>
+                <Col xs={10}>
+                    <hr style={{
+                        border:0,
+                        color:'red',
+                        backgroundColor:'red',
+                        height: '2px',
+                        width: '100%'}}/>
+                    </Col>
+                <Col>
+                    <Badge variant="danger"> New </Badge>
+                </Col>
+        </Row>;
+    }
+
+    componentDidMount(): void {
+        const last = this.props.ingameGameState.gameLogManager.logs.length -1;
+        this.props.ingameGameState.onLogSeen(this.props.ingameGameState.gameLogManager.logs[last], this.props.user)
+    }
+
+    componentDidUpdate(): void {
+        const last = this.props.ingameGameState.gameLogManager.logs.length -1;
+        this.props.ingameGameState.onLogSeen(this.props.ingameGameState.gameLogManager.logs[last], this.props.user)
     }
 }

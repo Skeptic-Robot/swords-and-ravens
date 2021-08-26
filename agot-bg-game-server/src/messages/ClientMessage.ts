@@ -1,10 +1,12 @@
+import { GameLogData } from "../common/ingame-game-state/game-data-structure/GameLog";
+
 export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready | ResolveMarchOrder | DeclareSupport
     | RefuseSupport | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseSeeTopWildlingCard | KickPlayer
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
     | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
     | CancelGame | Vote | LaunchCancelGameVote | CancelVote | LaunchReplacePlayerVote | UpdateNote | SelectWesterosCard
-    | ClaimVassal | LaunchReplacePlayerByVassalVote | GiftPowerTokens | LaunchEndGameVote | SetPassword;
+    | ClaimVassal | LaunchReplacePlayerByVassalVote | GiftPowerTokens | LaunchEndGameVote | SetPassword | UpdateLastSeenLogs;
 
 interface Ping {
     type: "ping";
@@ -246,4 +248,10 @@ interface LaunchEndGameVote {
 interface SetPassword {
     type: "set-password";
     password: string;
+}
+
+interface UpdateLastSeenLogs {
+    type: "update-last-seen-logs";
+    user: string;
+    log: {time: number, data: GameLogData};
 }
