@@ -23,6 +23,7 @@ import WesterosCardType from "../../common/ingame-game-state/game-data-structure
 import { rainsOfAutumn, stormOfSwords, webOfLies, seaOfStorms, feastForCrows } from "../../common/ingame-game-state/game-data-structure/westeros-card/westerosCardTypes";
 import { renderRegionTooltip } from "../regionTooltip";
 import info from "../../../public/images/icons/info.svg"
+import { preventOverflow } from "@popperjs/core";
 
 @observer
 export default class PlaceOrdersComponent extends Component<GameStateComponentProps<PlaceOrdersGameState>> {
@@ -60,9 +61,9 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
     render(): ReactNode {
         return (
             <>
-                <ListGroupItem>
-                    <Row>
-                        <Col xs={12}>
+                <ListGroupItem style={{borderStyle: "none"}}>
+                    <Row className="justify-content-center">
+                        <Col xs={12} className="text-center">
                             {!this.forVassals ? (
                                 <>Players must assign orders in each region where they possess at least one unit now.</>
                             ) : (
@@ -97,9 +98,9 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                 </Row>
                             )}
                             <Row>
-                                <div className="text-center" style={{marginTop: 10}}>
+                                <Col xs={12} className="text-center" style={{marginTop: 10}}>
                                     Waiting for {this.placeOrders.getNotReadyPlayers().map(p => p.house.name).join(', ')}...
-                                </div>
+                                </Col>
                             </Row>
                         </Col>
                     </Row>
@@ -138,11 +139,11 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                 rootClose
                                 overlay={
                                     <Popover id={"region" + r.id}>
-                                        <Row className="justify-content-center align-items-center">
+                                        <Row className="justify-content-center align-items-center mt-2">
                                             <Col xs="auto"><b>{r.name}</b></Col>
                                             <Col xs="auto">
                                                 <OverlayTrigger overlay={renderRegionTooltip(r)}
-                                                    popperConfig={{ modifiers: { preventOverflow: { boundariesElement: "viewport" } } }}
+                                                    popperConfig={{modifiers: [preventOverflow]}}
                                                     placement="auto">
                                                 <div style={{backgroundImage: `url(${info})`, width: 16, height: 16, backgroundSize: "contain", backgroundPosition: "center", backgroundRepeat: "no-repeat"}}/>
                                                 </OverlayTrigger>

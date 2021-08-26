@@ -41,6 +41,10 @@ class User(AbstractUser):
     last_activity = models.DateTimeField(auto_now_add=True, blank=True)
     email_notification_active = models.BooleanField(default=True)
     vanilla_forum_user_id = models.IntegerField(default=0)
+    mute_games = models.BooleanField(default=False)
+    use_house_names_for_chat = models.BooleanField(default=True)
+    use_map_scrollbar = models.BooleanField(default=True)
+    use_responsive_layout_on_mobile = models.BooleanField(default=False)
 
     def is_in_group(self, group_name):
         return self.groups.filter(name=group_name).exists()
@@ -52,7 +56,7 @@ class User(AbstractUser):
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if settings.DEFAULT_GROUP and created:
-        group = Group.objects.get(name=settings.DEFAULT_GROUP)
+        group = Group.objects.get(name="Member")
         group.user_set.add(instance)
 
 

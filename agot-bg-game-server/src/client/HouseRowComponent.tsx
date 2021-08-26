@@ -24,6 +24,7 @@ import { observer } from "mobx-react";
 import GiftPowerTokensComponent from "./GiftPowerTokensComponent";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
+import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
 
 interface HouseRowComponentProps {
@@ -60,14 +61,15 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         const victoryPointsWarning = gameRunning && (this.game.structuresCountNeededToWin - 2 == totalHeldStructures);
         const victoryPointsCritical = gameRunning && (this.game.structuresCountNeededToWin - 1 == totalHeldStructures);
         return this.props.ingame.rerender >= 0 && <>
-            <ListGroupItem>
+            <ListGroupItem style={{paddingLeft: "8px", paddingRight: "10px"}}>
                 <Row className="align-items-center">
-                    <Col xs="auto" className="pr-0" style={{width: "28px"}}>
+                    <Col xs="auto" className="pr-0" style={{width: "32px"}}>
                         {!this.isVassal ? (
                             <FontAwesomeIcon
                                 className={classNames({"invisible": !this.props.gameClient.isAuthenticatedUser(this.player.user)})}
                                 style={{color: this.house.color}}
                                 icon={faStar}
+                                size="lg"
                             />
                         ) : (
                             <OverlayTrigger
@@ -80,12 +82,12 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                     </Tooltip>
                                 }
                             >
-                                <img src={battleGearImage} width={24} style={{margin: "-4px"}} />
+                                <img src={battleGearImage} width={32} style={{margin: "-4px"}} />
                             </OverlayTrigger>
                         )}
                     </Col>
                     <Col>
-                        <b style={{"color": this.house.color}}>{this.house.name}</b><br/>
+                        <h5 style={{margin: 0, padding: 0}}><b style={{"color": this.house.color}}>{this.house.name}</b><br/></h5>
                         {!this.isVassal ? (
                             <>
                                 {" "}
@@ -96,13 +98,11 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                 />
                             </>
                         ) : (
-                            <small>
-                                {this.suzerainHouse ? (
-                                    <>Commanded by {this.suzerainHouse.name}</>
-                                ) : (
-                                    <>Up for grab</>
-                                )}
-                            </small>
+                            this.suzerainHouse ? (
+                                <>Commanded by {this.suzerainHouse.name}</>
+                            ) : (
+                                <>Up for grab</>
+                            )
                         )}
                     </Col>
                     <Col xs="auto">
@@ -130,12 +130,12 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             ))}
                         </Row>
                     </Col>
-                    <OverlayTrigger
+                    {!this.isVassal && (<OverlayTrigger
                         overlay={this.renderTotalLandRegionsTooltip(this.house)}
                         delay={{ show: 250, hide: 100 }}
                         placement="auto"
                     >
-                        <Col xs="auto" className={classNames("d-flex align-items-center", {"invisible": this.isVassal})}>
+                        <Col xs="auto" className="d-flex align-items-center">
                             <div style={{fontSize: "20px", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined}}><b>{totalHeldStructures}</b></div>
                             <img
                                 className={classNames(
@@ -146,7 +146,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                 style={{marginLeft: "10px"}}
                             />
                     </Col>
-                    </OverlayTrigger>
+                    </OverlayTrigger>)}
                     <Col xs="auto" className={classNames("d-flex align-items-center", {"invisible": this.isVassal})}>
                         <div style={{fontSize: "18px"}}>{this.house.powerTokens}</div>
                         <OverlayTrigger
@@ -196,25 +196,25 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         </>;
     }
 
-    private renderUnitTypeTooltip(unitType: UnitType): ReactNode {
+    private renderUnitTypeTooltip(unitType: UnitType): OverlayChildren {
         return <Tooltip id={unitType.id + "-tooltip"}>
             <b>{unitType.name}</b><br/>
             <small>{unitType.description}</small>
         </Tooltip>;
     }
 
-    private renderTotalLandRegionsTooltip(house: House): ReactNode {
+    private renderTotalLandRegionsTooltip(house: House): OverlayChildren {
         return <Tooltip id={house.id + "-total-land-regions"}>
             <h5>Total Land Areas</h5><br/><h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
         </Tooltip>;
     }
 
-    private renderPowerPopover(house: House): ReactNode {
+    private renderPowerPopover(house: House): OverlayChildren {
         const availablePower =  house.powerTokens;
         const powerTokensOnBoard = this.game.countPowerTokensOnBoard(house);
         const powerInPool = this.game.maxPowerTokens - availablePower - powerTokensOnBoard;
 
-        return <Popover id={house.id + "-power-tooltip"}>
+        return <Popover id={house.id + "-power-tooltip"} className="p-2">
             <b>{house.name}</b><br/>
             <small>Available: </small><b>{availablePower}</b><br/>
             <small>On the board: </small><b>{powerTokensOnBoard}</b><br/>
