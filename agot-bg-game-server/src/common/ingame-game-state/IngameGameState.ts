@@ -744,6 +744,7 @@ export default class IngameGameState extends GameState<
                 user: user.id,
                 log: {time: log.time.getTime() / 1000, data: log.data}
             })
+            this.gameLogManager.lastSeenLogs.replace(user,log)
         }
     }
 

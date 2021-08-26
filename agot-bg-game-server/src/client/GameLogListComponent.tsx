@@ -98,8 +98,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 <Col>
                     <div className="game-log-content">
                         {this.renderGameLogData(l.data)}
-                        {this.lastSeenLog != null && this.renderGameLogData(this.lastSeenLog.data)}
-                        {this.lastSeenLog != null && l.time.getTime() == this.lastSeenLog.time.getTime() && this.renderNewLogsLine()}
+                        {this.lastSeenLog != null && this.props.ingameGameState.gameLogManager.logs.length -1 > i && l.time.getTime() == this.lastSeenLog.time.getTime() && this.renderNewLogsLine()}
                     </div>
                 </Col>
             </Row>
@@ -1342,11 +1341,6 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <Badge variant="danger"> New </Badge>
                 </Col>
         </Row>;
-    }
-
-    componentDidMount(): void {
-        const last = this.props.ingameGameState.gameLogManager.logs.length -1;
-        this.props.ingameGameState.onLogSeen(this.props.ingameGameState.gameLogManager.logs[last], this.props.user)
     }
 
     componentDidUpdate(): void {
